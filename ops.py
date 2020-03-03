@@ -4,7 +4,6 @@ from tensorflow.keras import layers
 
 
 class Sigmoid(layers.Layer):
-
     def __init__(self):
         super(Sigmoid, self).__init__()
 
@@ -26,7 +25,7 @@ class Conv2D(layers.Layer):
         self.conv_op = layers.Conv2D(filters=filters,
                                      kernel_size=kernel_size,
                                      strides=strides,
-                                     padding='same',
+                                     padding="same",
                                      kernel_initializer=keras.initializers.TruncatedNormal(stddev=0.02),
                                      use_bias=True,
                                      bias_initializer=keras.initializers.Constant(value=0.0))
@@ -68,7 +67,7 @@ class UpConv2D(layers.Layer):
         self.up_conv_op = layers.Conv2DTranspose(filters,
                                                  kernel_size=kernel_size,
                                                  strides=strides,
-                                                 padding='same',
+                                                 padding="same",
                                                  kernel_initializer=keras.initializers.RandomNormal(stddev=0.02),
                                                  use_bias=True,
                                                  bias_initializer=keras.initializers.Constant(value=0.0))
@@ -84,4 +83,4 @@ def conv_cond_concat(x, y):
     y_shapes = tf.shape(y)
     y = tf.reshape(y, [-1, 1, 1, y_shapes[1]])
     y_shapes = tf.shape(y)
-    return tf.concat([x, y*tf.ones([x_shapes[0], x_shapes[1], x_shapes[2], y_shapes[3]])], 3)
+    return tf.concat([x, y * tf.ones([x_shapes[0], x_shapes[1], x_shapes[2], y_shapes[3]])], 3)

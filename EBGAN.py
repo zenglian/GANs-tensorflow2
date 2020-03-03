@@ -14,7 +14,7 @@ from utils import *
 # the network is based on https://github.com/hwalsuklee/tensorflow-generative-model-collections
 class Discriminator(tf.keras.Model):
     def __init__(self, batch_size=64, is_training=True):
-        super(Discriminator, self).__init__(name='discriminator')
+        super(Discriminator, self).__init__(name="discriminator")
         self.batch_size = batch_size
         self.is_training = is_training
         self.bn_1 = BatchNorm(is_training=self.is_training)
@@ -41,7 +41,7 @@ class Discriminator(tf.keras.Model):
 
 class Generator(tf.keras.Model):
     def __init__(self, is_training=True):
-        super(Generator, self).__init__(name='generator')
+        super(Generator, self).__init__(name="generator")
         self.is_training = is_training
         self.fc_1 = DenseLayer(1024)
         self.fc_2 = DenseLayer(128*7*7)
@@ -86,13 +86,13 @@ class EBGAN():
         self.log_dir = args.log_dir
         self.learnning_rate = args.lr
         self.epoches = args.epoch
-        self.datasets = load_mnist_data(datasets=self.datasets_name, batch_size=args.batch_size)
+        self.datasets = load_mnist_data(dataset_name=self.datasets_name, batch_size=args.batch_size)
         self.g = Generator(is_training=True)
         self.d = Discriminator(is_training=True)
         self.g_optimizer = keras.optimizers.Adam(lr=5*self.learnning_rate, beta_1=0.5)
         self.d_optimizer = keras.optimizers.Adam(lr=self.learnning_rate, beta_1=0.5)
-        self.g_loss_metric = tf.keras.metrics.Mean('g_loss', dtype=tf.float32)
-        self.d_loss_metric = tf.keras.metrics.Mean('d_loss', dtype=tf.float32)
+        self.g_loss_metric = tf.keras.metrics.Mean("g_loss", dtype=tf.float32)
+        self.d_loss_metric = tf.keras.metrics.Mean("d_loss", dtype=tf.float32)
         self.checkpoint = tf.train.Checkpoint(step=tf.Variable(0),
                                               generator_optimizer=self.g_optimizer,
                                               discriminator_optimizer=self.d_optimizer,
@@ -160,22 +160,22 @@ class EBGAN():
                 step = int(self.checkpoint.step)
 
                 # save generated images for every 50 batches training
-                if step % 50 == 0:
-                    print('step： {}, d_loss: {:.4f}, g_loss: {:.4F}'.format(
+                if step % 100 == 0:
+                    print("step： {}, d_loss: {:.4f}, g_loss: {:.4F}".format(
                         step, self.d_loss_metric.result(), self.g_loss_metric.result()))
                     manifold_h = int(np.floor(np.sqrt(self.batch_size)))
                     manifold_w = int(np.floor(np.sqrt(self.batch_size)))
                     result_to_display = self.g(self.sample_z, training=False)
                     save_images(result_to_display[:manifold_h * manifold_w, :, :, :],
                                 [manifold_h, manifold_w],
-                                './' + check_folder(self.result_dir + '/' + self.model_dir) + '/' + self.model_name + '_train_{:02d}_{:04d}.png'.format(epoch, int(step)))
+                                "./" + check_folder(self.result_dir + "/" + self.model_dir) + "/" + self.model_name + "_train_{:02d}_{:04d}.png".format(epoch, int(step)))
 
                     with self.train_summary_writer.as_default():
-                        tf.summary.scalar('g_loss', self.g_loss_metric.result(), step=step)
-                        tf.summary.scalar('d_loss', self.d_loss_metric.result(), step=step)
+                        tf.summary.scalar("g_loss", self.g_loss_metric.result(), step=step)
+                        tf.summary.scalar("d_loss", self.d_loss_metric.result(), step=step)
 
                 #save checkpoints for every 400 batches training
-                if step % 400 == 0:
+                if step % 1000 == 0:
                     save_path = self.manager.save()
                     print("\n----------Saved checkpoint for step {}: {}-----------\n".format(step, save_path))
                     self.g_loss_metric.reset_states()
@@ -195,21 +195,21 @@ class EBGAN():
 def parse_args():
     desc = "Tensorflow implementation of GAN collections"
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('--gan_type', type=str, default='EBGAN')
-    parser.add_argument('--datasets', type=str, default='mnist')
-    parser.add_argument('--lr', type=float, default=2e-4)
-    parser.add_argument('--epoch', type=int, default=20,
-                        help='The number of epochs to run')
-    parser.add_argument('--batch_size', type=int,
-                        default=64, help='The size of batch')
-    parser.add_argument('--z_dim', type=int, default=62,
-                        help='Dimension of noise vector')
-    parser.add_argument('--checkpoint_dir', type=str, default='checkpoint',
-                        help='Directory name to save the checkpoints')
-    parser.add_argument('--result_dir', type=str, default='results',
-                        help='Directory name to save the generated images')
-    parser.add_argument('--log_dir', type=str, default='logs',
-                        help='Directory name to save training logs')
+    parser.add_argument("--gan_type", type=str, default="EBGAN")
+    parser.add_argument("--datasets", type=str, default="mnist")
+    parser.add_argument("--lr", type=float, default=2e-4)
+    parser.add_argument("--epoch", type=int, default=20,
+                        help="The number of epochs to run")
+    parser.add_argument("--batch_size", type=int,
+                        default=64, help="The size of batch")
+    parser.add_argument("--z_dim", type=int, default=62,
+                        help="Dimension of noise vector")
+    parser.add_argument("--checkpoint_dir", type=str, default="checkpoint",
+                        help="Directory name to save the checkpoints")
+    parser.add_argument("--result_dir", type=str, default="results",
+                        help="Directory name to save the generated images")
+    parser.add_argument("--log_dir", type=str, default="logs",
+                        help="Directory name to save training logs")
 
     return check_args(parser.parse_args())
 
@@ -228,13 +228,13 @@ def check_args(args):
     check_folder(args.log_dir)
 
     # --epoch
-    assert args.epoch >= 1, 'number of epochs must be larger than or equal to one'
+    assert args.epoch >= 1, "number of epochs must be larger than or equal to one"
 
     # --batch_size
-    assert args.batch_size >= 1, 'batch size must be larger than or equal to one'
+    assert args.batch_size >= 1, "batch size must be larger than or equal to one"
 
     # --z_dim
-    assert args.z_dim >= 1, 'dimension of noise vector must be larger than or equal to one'
+    assert args.z_dim >= 1, "dimension of noise vector must be larger than or equal to one"
 
     return args
 
@@ -247,5 +247,5 @@ def main():
     model.train(load=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
